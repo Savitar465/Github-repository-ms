@@ -22,7 +22,6 @@ dependencies {
 
     // Generación de OpenAPI / Swagger desde el modelo
     smithyBuild "software.amazon.smithy:smithy-openapi:1.69.0"
-    smithyBuild "software.amazon.smithy:smithy-aws-apigateway-openapi:1.69.0"
 
     // CLI para generar codigo desde OpenAPI
     openapiGenerator "org.openapitools:openapi-generator-cli:7.5.0"
@@ -33,7 +32,7 @@ sourceSets.main.java.srcDirs = ['model']
 def smithyProjectionBase = layout.buildDirectory.dir("smithyprojections/${rootProject.name}").get().asFile.absolutePath
 
 def codegenTargets = [
-        [id: "repo", projection: "openapi-repo", specName: "RepoApi", packageBase: "com.github.generated.repo", generateTypeScriptClient: true, generateJavaServer: true],
+        [id: "repo", projection: "github-repo", specName: "RepoApi", packageBase: "com.github.generated.repo", generateTypeScriptClient: true, generateJavaServer: true],
 ]
 
 def typeScriptClientTaskNames = []

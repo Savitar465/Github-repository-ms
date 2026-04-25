@@ -20,7 +20,10 @@ mini-github-smithy/
     ├── auth/
     │   └── auth.smithy               ← Auth Service (HU-01 a HU-05)
     ├── repo/
-    │   └── repo.smithy               ← Repo Service (HU-06 a HU-23)
+    │   ├── services/
+    │   │   └── repo-api.smithy       ← Service RepoApi
+    │   ├── operations/               ← Operaciones por dominio
+    │   └── structures/               ← DTOs, inputs, outputs y listas
     ├── issue/
     │   └── issue.smithy              ← Issue Service + Pull Requests (HU-19-21)
     └── search/
@@ -100,7 +103,7 @@ Incluye codegen para `auth`, `repo`, `issue`, `issueComments`, `files` y `search
 - Clientes TypeScript: `build/generated/openapi/*-typescript-client`
 - Servers Java con delegates/services: `build/generated/openapi/*-java-server`
 
-Nota: en `repo` y `files` hay rutas Smithy con labels greedy (`{filePath+}`), por lo que OpenAPI Generator muestra warnings de validacion; el flujo de Gradle ya esta configurado con `--skip-validate-spec` para generar codigo correctamente.
+Nota: las operaciones de contenidos del repositorio usan `path` como query (`/contents?path=...`) para evitar labels greedy y mejorar compatibilidad con herramientas OpenAPI.
 
 ## Autenticación
 

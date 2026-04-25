@@ -3,7 +3,7 @@
   "sources": ["model"],
   "projections": {
     "source": {},
-    "openapi-repo": {
+    "github-repo": {
       "plugins": {
         "openapi": {
           "service": "com.github.repo#RepoApi",
