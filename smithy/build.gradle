@@ -1,0 +1,104 @@
+plugins {
+    id("java-library")
+    id("software.amazon.smithy.gradle.smithy-jar").version("1.4.0")
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    openapiGenerator
+}
+
+dependencies {
+    // Smithy core — valida el modelo
+    smithyBuild "software.amazon.smithy:smithy-model:1.69.0"
+
+    // Traits de autenticación y AWS (Bearer, restJson1, etc.)
+    smithyBuild "software.amazon.smithy:smithy-aws-traits:1.69.0"
+    // Also publish this dependency for downstream model validation of @restJson1.
+    api "software.amazon.smithy:smithy-aws-traits:1.69.0"
+
+    // Generación de OpenAPI / Swagger desde el modelo
+    smithyBuild "software.amazon.smithy:smithy-openapi:1.69.0"
+    smithyBuild "software.amazon.smithy:smithy-aws-apigateway-openapi:1.69.0"
+
+    // CLI para generar codigo desde OpenAPI
+    openapiGenerator "org.openapitools:openapi-generator-cli:7.5.0"
+}
+
+sourceSets.main.java.srcDirs = ['model']
+
+def smithyProjectionBase = layout.buildDirectory.dir("smithyprojections/${rootProject.name}").get().asFile.absolutePath
+
+def codegenTargets = [
+        [id: "repo", projection: "openapi-repo", specName: "RepoApi", packageBase: "com.github.generated.repo", generateTypeScriptClient: true, generateJavaServer: true],
+]
+
+def typeScriptClientTaskNames = []
+def javaServerTaskNames = []
+
+codegenTargets.each { target ->
+    def specPath = "${smithyProjectionBase}/${target.projection}/openapi/${target.specName}.openapi.json"
+    def targetName = target.id.substring(0, 1).toUpperCase() + target.id.substring(1)
+
+    if (target.generateTypeScriptClient) {
+        def taskName = "generate${targetName}TypeScriptClient"
+        typeScriptClientTaskNames << taskName
+
+        tasks.register(taskName, JavaExec) {
+            dependsOn tasks.named("smithyBuild")
+            group = "code generation"
+            description = "Genera cliente TypeScript desde ${target.specName} OpenAPI"
+            classpath = configurations.openapiGenerator
+            mainClass = "org.openapitools.codegen.OpenAPIGenerator"
+            args "generate", "-g", "typescript-fetch",
+                    "--skip-validate-spec",
+                    "-i", specPath,
+                    "-o", layout.buildDirectory.dir("generated/openapi/${target.id}-typescript-client").get().asFile.absolutePath,
+                    "--additional-properties", "supportsES6=true,typescriptThreePlus=true,withInterfaces=true,useSingleRequestParameter=true,npmName=github-${target.id}-client,npmVersion=1.0.0,hideGenerationTimestamp=true"
+        }
+    }
+
+    if (target.generateJavaServer) {
+        def taskName = "generate${targetName}JavaServer"
+        javaServerTaskNames << taskName
+
+        tasks.register(taskName, JavaExec) {
+            dependsOn tasks.named("smithyBuild")
+            group = "code generation"
+            description = "Genera server Java Spring (controllers + delegates) desde ${target.specName} OpenAPI"
+            classpath = configurations.openapiGenerator
+            mainClass = "org.openapitools.codegen.OpenAPIGenerator"
+            args "generate", "-g", "spring",
+                    "--skip-validate-spec",
+                    "-i", specPath,
+                    "-o", layout.buildDirectory.dir("generated/openapi/${target.id}-java-server").get().asFile.absolutePath,
+                    "--api-package", "${target.packageBase}.server.api",
+                    "--model-package", "${target.packageBase}.server.model",
+                    "--invoker-package", "${target.packageBase}.server.invoker",
+                    "--additional-properties", "delegatePattern=true,useSpringBoot3=true,useJakartaEe=true,dateLibrary=java8,hideGenerationTimestamp=true"
+        }
+    }
+}
+
+tasks.register("generateAllTypeScriptClients") {
+    group = "code generation"
+    description = "Genera todos los clientes TypeScript"
+    dependsOn typeScriptClientTaskNames.collect { tasks.named(it) }
+}
+
+tasks.register("generateAllJavaServers") {
+    group = "code generation"
+    description = "Genera todos los servers Java con stubs de services (delegate pattern)"
+    dependsOn javaServerTaskNames.collect { tasks.named(it) }
+}
+
+tasks.register("generateAllCodegen") {
+    group = "code generation"
+    description = "Genera clientes TypeScript y servers Java para todos los dominios"
+    dependsOn tasks.named("generateAllTypeScriptClients"), tasks.named("generateAllJavaServers")
+}
+
+sourceSets.main.java.srcDirs = ['model', 'models']

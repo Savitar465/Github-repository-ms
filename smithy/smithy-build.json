@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "sources": ["model"],
+  "projections": {
+    "source": {},
+    "openapi-repo": {
+      "plugins": {
+        "openapi": {
+          "service": "com.github.repo#RepoApi",
+          "protocol": "aws.protocols#restJson1"
+        }
+      }
+    }
+  }
+}
