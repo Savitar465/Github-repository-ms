@@ -1,6 +1,6 @@
-# Guía de Contribuciones - ms-usuarios
+# Guía de Contribuciones - Github-repository-ms
 
-Gracias por interés en contribuir a `ms-usuarios`. Este documento define el proceso, estándares y expectativas.
+Gracias por interés en contribuir a `Github-repository-ms`. Este documento define el proceso, estándares y expectativas.
 
 ## Tabla de contenidos
 - [Código de conducta](#código-de-conducta)
@@ -21,9 +21,9 @@ Gracias por interés en contribuir a `ms-usuarios`. Este documento define el pro
 
 ### 1. Fork y clona
 ```bash
-git clone https://github.com/<tu-usuario>/ms-usuarios.git
-cd ms-usuarios
-git remote add upstream https://github.com/<org>/ms-usuarios.git
+git clone https://github.com/<tu-usuario>/Github-repository-ms.git
+cd Github-repository-ms
+git remote add upstream https://github.com/<org>/Github-repository-ms.git
 ```
 
 ### 2. Crea rama de trabajo
@@ -280,7 +280,7 @@ Ir a GitHub, crear PR hacia `develop` o `main`:
 **¿Cómo me comunico con el equipo?**
 - GitHub Issues para bugs/features
 - Pull Requests para código
-- Slack `#ms-usuarios-dev` para discusiones
+- Slack `#Github-repository-ms-dev` para discusiones
 
 **¿Cuánto tiempo toma la revisión?**
 - ~24-48 horas para feedback inicial
@@ -292,5 +292,5 @@ Ir a GitHub, crear PR hacia `develop` o `main`:
 
 ---
 
-**Gracias por contribuir a mejorar ms-usuarios** 🚀
+**Gracias por contribuir a mejorar Github-repository-ms** 🚀
 

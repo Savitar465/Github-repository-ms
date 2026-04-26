@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.githubx</groupId>
-    <artifactId>Github-repository-ms</artifactId>
+    <artifactId>github-repository-ms</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Github-repository-ms</name>
     <description>Github-repository-ms</description>
