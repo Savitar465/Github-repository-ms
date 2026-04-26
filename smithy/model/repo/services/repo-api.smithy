@@ -7,11 +7,11 @@ use smithy.api#documentation
 use smithy.api#httpBearerAuth
 use smithy.api#title
 
-@title("GitHub Repo API")
+@title("GitHub Repository API")
 @restJson1
 @httpBearerAuth
-@documentation("Servicio de repositorios, ramas, estrellas, colaboradores y contenido basico del repo.")
-service RepoApi {
+@documentation("Servicio de dominio para repositorios (CRUD y forks).")
+service RepositoryApi {
     version: "1.0.0"
     operations: [
         ListMyRepositories
@@ -21,23 +21,5 @@ service RepoApi {
         DeleteRepository
         ForkRepository
         ListRepositoryForks
-        GetRepoContents
-        UploadFile
-        DeleteFile
-        DownloadArchive
-        ListBranches
-        GetBranch
-        CreateBranch
-        DeleteBranch
-        StarRepository
-        UnstarRepository
-        StarRepositoryForAuthenticatedUser
-        UnstarRepositoryForAuthenticatedUser
-        ListCollaborators
-        GetCollaborator
-        AddCollaboratorByUsername
-        AddCollaboratorWithRole
-        UpdateCollaboratorRole
-        RemoveCollaborator
     ]
 }

@@ -30,9 +30,25 @@ dependencies {
 sourceSets.main.java.srcDirs = ['model']
 
 def smithyProjectionBase = layout.buildDirectory.dir("smithyprojections/${rootProject.name}").get().asFile.absolutePath
+def generatedTypeScriptBase = layout.buildDirectory.dir("generated/typescript").get().asFile.absolutePath
+def generatedSpringBase = layout.buildDirectory.dir("generated/spring").get().asFile.absolutePath
 
 def codegenTargets = [
-        [id: "repo", projection: "github-repo", specName: "RepoApi", packageBase: "com.smithy.g.repo", generateTypeScriptClient: true, generateJavaServer: true],
+        [id: "repository", projection: "github-repository", specName: "RepositoryApi", packageBase: "com.smithy.g.repo",
+         mavenGroupId: "com.github.repository", mavenArtifactId: "github-repository-service", mavenVersion: "1.0.0",
+         generateTypeScriptClient: true, generateJavaServer: true],
+        [id: "content", projection: "github-content", specName: "ContentApi", packageBase: "com.smithy.g.repo",
+         mavenGroupId: "com.github.content", mavenArtifactId: "github-content-service", mavenVersion: "1.0.0",
+         generateTypeScriptClient: true, generateJavaServer: true],
+        [id: "branch", projection: "github-branch", specName: "BranchApi", packageBase: "com.smithy.g.repo",
+         mavenGroupId: "com.github.branch", mavenArtifactId: "github-branch-service", mavenVersion: "1.0.0",
+         generateTypeScriptClient: true, generateJavaServer: true],
+        [id: "collaborator", projection: "github-collaborator", specName: "CollaboratorApi", packageBase: "com.smithy.g.repo",
+         mavenGroupId: "com.github.collaborator", mavenArtifactId: "github-collaborator-service", mavenVersion: "1.0.0",
+         generateTypeScriptClient: true, generateJavaServer: true],
+        [id: "social", projection: "github-social", specName: "SocialApi", packageBase: "com.smithy.g.repo",
+         mavenGroupId: "com.github.social", mavenArtifactId: "github-social-service", mavenVersion: "1.0.0",
+         generateTypeScriptClient: true, generateJavaServer: true],
 ]
 
 def typeScriptClientTaskNames = []
@@ -52,17 +68,20 @@ codegenTargets.each { target ->
             description = "Genera cliente TypeScript desde ${target.specName} OpenAPI"
             classpath = configurations.openapiGenerator
             mainClass = "org.openapitools.codegen.OpenAPIGenerator"
-            args "generate", "-g", "typescript-fetch",
+            args = [
+                    "generate", "-g", "typescript-fetch",
                     "--skip-validate-spec",
                     "-i", specPath,
-                    "-o", layout.buildDirectory.dir("${target.projection}/${target.id}-typescript-client").get().asFile.absolutePath,
+                    "-o", "${generatedTypeScriptBase}/${target.id}-client",
                     "--additional-properties", "supportsES6=true,typescriptThreePlus=true,withInterfaces=true,useSingleRequestParameter=true,npmName=github-${target.id}-client,npmVersion=1.0.0,hideGenerationTimestamp=true"
+            ]
         }
     }
 
     if (target.generateJavaServer) {
         def taskName = "generate${targetName}JavaServer"
         javaServerTaskNames << taskName
+        def domainModuleBase = "${generatedSpringBase}/${target.id}-module"
 
         tasks.register(taskName, JavaExec) {
             dependsOn tasks.named("smithyBuild")
@@ -70,14 +89,16 @@ codegenTargets.each { target ->
             description = "Genera server Java Spring (controllers + delegates) desde ${target.specName} OpenAPI"
             classpath = configurations.openapiGenerator
             mainClass = "org.openapitools.codegen.OpenAPIGenerator"
-            args "generate", "-g", "spring",
+            args = [
+                    "generate", "-g", "spring",
                     "--skip-validate-spec",
                     "-i", specPath,
-                    "-o", layout.buildDirectory.dir("${target.projection}/${target.id}-java-server").get().asFile.absolutePath,
-                    "--api-package", "${target.packageBase}.server.api",
-                    "--model-package", "${target.packageBase}.server.model",
-                    "--invoker-package", "${target.packageBase}.server.invoker",
-                    "--additional-properties", "delegatePattern=true,useSpringBoot3=true,useJakartaEe=true,dateLibrary=java8,hideGenerationTimestamp=true"
+                    "-o", domainModuleBase,
+                    "--api-package", "${target.packageBase}.server.${target.id}.api",
+                    "--model-package", "${target.packageBase}.server.${target.id}.model",
+                    "--invoker-package", "${target.packageBase}.server.${target.id}.invoker",
+                    "--additional-properties", "groupId=${target.mavenGroupId},artifactId=${target.mavenArtifactId},artifactVersion=${target.mavenVersion},delegatePattern=true,useSpringBoot3=true,useJakartaEe=true,dateLibrary=java8,hideGenerationTimestamp=true"
+            ]
         }
     }
 }
@@ -90,7 +111,7 @@ tasks.register("generateAllTypeScriptClients") {
 
 tasks.register("generateAllJavaServers") {
     group = "code generation"
-    description = "Genera todos los servers Java con stubs de services (delegate pattern)"
+    description = "Genera todos los servers Java con stubs de services (delegate pattern) en módulos separados por dominio"
     dependsOn javaServerTaskNames.collect { tasks.named(it) }
 }
 
@@ -100,4 +121,4 @@ tasks.register("generateAllCodegen") {
     dependsOn tasks.named("generateAllTypeScriptClients"), tasks.named("generateAllJavaServers")
 }
 
-sourceSets.main.java.srcDirs = ['model', 'models']
+

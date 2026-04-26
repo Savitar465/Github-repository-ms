@@ -25,14 +25,18 @@ smithy/
 │   └── repo/
 │       ├── repo.smithy
 │       ├── services/
-│       │   └── repo-api.smithy
+│       │   ├── repo-api.smithy
+│       │   ├── content-api.smithy
+│       │   ├── branch-api.smithy
+│       │   ├── collaborator-api.smithy
+│       │   └── social-api.smithy
 │       ├── operations/
-│       │   ├── repo-operations.smithy
+│       │   ├── repository-operations.smithy
 │       │   ├── content-operations.smithy
 │       │   ├── branch-operations.smithy
-│       │   └── collaborator-operations.smithy
+│       │   ├── collaborator-operations.smithy
+│       │   └── social-operations.smithy
 │       └── structures/
-│           ├── repo-structures.smithy
 │           ├── shared.smithy
 │           ├── repository.smithy
 │           ├── content.smithy
@@ -83,9 +87,39 @@ Set-Location "C:\Projects\Github-repository-ms\smithy"
 
 ## Salidas generadas
 
-- OpenAPI: `build/smithyprojections/<project>/<projection>/openapi/*.openapi.json`
-- Cliente TypeScript: `build/generated/openapi/*-typescript-client`
-- Server Java Spring: `build/generated/openapi/*-java-server`
+- **OpenAPI**: `build/smithyprojections/<project>/<projection>/openapi/*.openapi.json`
+- **Cliente TypeScript**: `build/generated/typescript/{domain}-client`
+  - `repository-client`, `content-client`, `branch-client`, `collaborator-client`, `social-client`
+- **Server Java Spring** (módulos independientes por dominio): `build/generated/spring/{domain}-module`
+  - `repository-module`, `content-module`, `branch-module`, `collaborator-module`, `social-module`
+
+Cada módulo Spring es completamente independiente e incluye:
+- Controllers y delegados (delegate pattern)
+- Modelos con enums propios
+- `EnumConverterConfiguration.java` para conversión automática de enumeraciones
+- `pom.xml` con todas las dependencias necesarias
+- Aplicación Spring Boot autoejecutable
+
+Estructura de paquetes en cada módulo:
+```
+com.smithy.g.repo.server.{domain}.api      (controllers)
+com.smithy.g.repo.server.{domain}.model    (DTOs y enums)
+com.smithy.g.repo.server.{domain}.invoker  (app principal)
+org.openapitools.configuration             (enum converters)
+
+## Generación por dominio
+
+Cada dominio genera un módulo Spring independiente. Esto permite:
+- **Independencia**: cada módulo puede desplegarse, versionarse y testearse por separado
+- **Claridad**: cada módulo contiene solo sus operaciones, modelos y conversores de enums
+- **Escalabilidad**: fácil agregar nuevos dominios o eliminar existentes
+
+Generar un dominio específico:
+
+```powershell
+.\gradlew.bat generateRepositoryJavaServer --no-daemon
+.\gradlew.bat generateContentJavaServer --no-daemon
+```
 
 ## Convenciones del modelo
 

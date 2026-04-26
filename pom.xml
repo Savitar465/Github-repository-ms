@@ -74,8 +74,8 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>openapi-spring</artifactId>
+            <groupId>com.github.repository</groupId>
+            <artifactId>github-repository-service</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>

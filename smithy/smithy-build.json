@@ -3,10 +3,42 @@
   "sources": ["model"],
   "projections": {
     "source": {},
-    "github-repo": {
+    "github-repository": {
       "plugins": {
         "openapi": {
-          "service": "com.github.repo#RepoApi",
+          "service": "com.github.repo#RepositoryApi",
+          "protocol": "aws.protocols#restJson1"
+        }
+      }
+    },
+    "github-content": {
+      "plugins": {
+        "openapi": {
+          "service": "com.github.repo#ContentApi",
+          "protocol": "aws.protocols#restJson1"
+        }
+      }
+    },
+    "github-branch": {
+      "plugins": {
+        "openapi": {
+          "service": "com.github.repo#BranchApi",
+          "protocol": "aws.protocols#restJson1"
+        }
+      }
+    },
+    "github-collaborator": {
+      "plugins": {
+        "openapi": {
+          "service": "com.github.repo#CollaboratorApi",
+          "protocol": "aws.protocols#restJson1"
+        }
+      }
+    },
+    "github-social": {
+      "plugins": {
+        "openapi": {
+          "service": "com.github.repo#SocialApi",
           "protocol": "aws.protocols#restJson1"
         }
       }
