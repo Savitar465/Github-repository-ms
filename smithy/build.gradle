@@ -99,6 +99,16 @@ codegenTargets.each { target ->
                     "--invoker-package", "${target.packageBase}.server.${target.id}.invoker",
                     "--additional-properties", "groupId=${target.mavenGroupId},artifactId=${target.mavenArtifactId},artifactVersion=${target.mavenVersion},delegatePattern=true,useSpringBoot3=true,useJakartaEe=true,dateLibrary=java8,hideGenerationTimestamp=true"
             ]
+
+            doLast {
+                def propsFile = file("${domainModuleBase}/src/main/resources/application.properties")
+                if (propsFile.exists()) {
+                    def filtered = propsFile.readLines()
+                            .findAll { it?.trim() != 'spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false' }
+                            .join(System.lineSeparator())
+                    propsFile.text = filtered ? filtered + System.lineSeparator() : ''
+                }
+            }
         }
     }
 }
