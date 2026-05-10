@@ -16,7 +16,7 @@ spring:
     authentication-database: ${MONGO_AUTH_DATABASE:admin}
 
 server:
-  port: ${SERVER_PORT:9081}
+  port: ${SERVER_PORT:8090}
   servlet:
     context-path: /
 
@@ -63,6 +63,15 @@ openapi:
     title: GitHub Social API
     description: Servicio de dominio para acciones sociales del repositorio (stars).
     version: 1.0.0
+
+git:
+  server:
+    http-url: ${GIT_SERVER_HTTP_URL:http://192.168.100.150:9080}
+    ssh-host: ${GIT_SERVER_SSH_HOST:192.168.100.150}
+    ssh-port: ${GIT_SERVER_SSH_PORT:2222}
+
+microservice:
+  auth-token: ${MICROSERVICE_AUTH_TOKEN:some-secret-token}
 
 logging:
   level:

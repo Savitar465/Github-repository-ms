@@ -3,6 +3,7 @@ package com.githubx.githubrepositoryms.service;
 import com.githubx.githubrepositoryms.dao.RepositoryDao;
 import com.githubx.githubrepositoryms.mapper.RepositoryMapper;
 import com.githubx.githubrepositoryms.model.RepositoryDocument;
+import com.githubx.githubrepositoryms.service.git.GitOpsService;
 import com.smithy.g.repo.server.repository.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     private final RepositoryDao repositoryDao;
     private final RepositoryMapper repositoryMapper;
+    private final GitOpsService gitOpsService;
 
     @Override
     public ResponseEntity<RepositoryDTO> createRepository(CreateRepositoryBody body) {
@@ -41,7 +43,9 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(repositoryMapper.toDto(repositoryDao.save(doc)));
+        RepositoryDocument saved = repositoryDao.save(doc);
+        gitOpsService.createBareRepo(saved.getOwnerUsername(), saved.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(repositoryMapper.toDto(saved));
     }
 
     @Override
@@ -51,16 +55,14 @@ public class RepositoryServiceImpl implements RepositoryService {
             return ResponseEntity.notFound().build();
         }
         repositoryDao.deleteById(found.get().getId());
+        gitOpsService.deleteBareRepo(owner, repo);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<RepositoryDTO> getRepository(String owner, String repo) {
         var found = repositoryDao.findByOwnerUsernameAndName(owner, repo);
-        if (found.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(repositoryMapper.toDto(found.get()));
+        return found.map(repositoryDocument -> ResponseEntity.ok(repositoryMapper.toDto(repositoryDocument))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Override
@@ -135,7 +137,9 @@ public class RepositoryServiceImpl implements RepositoryService {
 
         original.setForksCount(original.getForksCount() + 1);
         repositoryDao.save(original);
-        return ResponseEntity.status(HttpStatus.CREATED).body(repositoryMapper.toDto(repositoryDao.save(fork)));
+        RepositoryDocument savedFork = repositoryDao.save(fork);
+        gitOpsService.forkBareRepo(owner, repo, forkOwner, forkName);
+        return ResponseEntity.status(HttpStatus.CREATED).body(repositoryMapper.toDto(savedFork));
     }
 
     @Override
