@@ -74,20 +74,96 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.repository</groupId>
-            <artifactId>github-repository-service</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.5.5.Final</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.5.0</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>add-generated-smithy-sources-branch</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/smithy/build/generated/spring/branch-module/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-generated-smithy-sources-collaborator</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/smithy/build/generated/spring/collaborator-module/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-generated-smithy-sources-content</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/smithy/build/generated/spring/content-module/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-generated-smithy-sources-repository</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/smithy/build/generated/spring/repository-module/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-generated-smithy-sources-social</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/smithy/build/generated/spring/social-module/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <mainClass>com.githubx.githubrepositoryms.GithubRepositoryMsApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -112,6 +188,15 @@
                                     <groupId>org.projectlombok</groupId>
                                     <artifactId>lombok</artifactId>
                                 </path>
+                                <path>
+                                    <groupId>org.mapstruct</groupId>
+                                    <artifactId>mapstruct-processor</artifactId>
+                                    <version>1.5.5.Final</version>
+                                </path>
+                                <path>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-configuration-processor</artifactId>
+                                </path>
                             </annotationProcessorPaths>
                         </configuration>
                     </execution>
@@ -126,6 +211,15 @@
                                 <path>
                                     <groupId>org.projectlombok</groupId>
                                     <artifactId>lombok</artifactId>
+                                </path>
+                                <path>
+                                    <groupId>org.mapstruct</groupId>
+                                    <artifactId>mapstruct-processor</artifactId>
+                                    <version>1.5.5.Final</version>
+                                </path>
+                                <path>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-configuration-processor</artifactId>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>

@@ -108,6 +108,16 @@ codegenTargets.each { target ->
                             .join(System.lineSeparator())
                     propsFile.text = filtered ? filtered + System.lineSeparator() : ''
                 }
+                // Remove generated OpenAPI/Spring support classes that would conflict
+                // with the application's own implementations (e.g. HomeController,
+                // SpringDocConfiguration). Delete the entire configuration package
+                // if present to avoid leaving any helper classes that can cause
+                // duplicate-class errors when the generated sources are added to
+                // the project classpath.
+                def configDir = file("${domainModuleBase}/src/main/java/org/openapitools/configuration")
+                if (configDir.exists()) {
+                    project.delete(configDir)
+                }
             }
         }
     }
@@ -130,5 +140,3 @@ tasks.register("generateAllCodegen") {
     description = "Genera clientes TypeScript y servers Java para todos los dominios"
     dependsOn tasks.named("generateAllTypeScriptClients"), tasks.named("generateAllJavaServers")
 }
-
-

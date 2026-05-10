@@ -1,3 +1,72 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: Github-repository-ms
+
+  data:
+    mongodb:
+      auto-index-creation: true
+  mongodb:
+    host: ${MONGO_HOST:192.168.100.150}
+    port: ${MONGO_PORT:27017}
+    database: ${MONGO_DATABASE:github_repository_ms}
+    username: ${MONGO_USERNAME:}
+    password: ${MONGO_PASSWORD:}
+    authentication-database: ${MONGO_AUTH_DATABASE:admin}
+
+server:
+  port: ${SERVER_PORT:9081}
+  servlet:
+    context-path: /
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+openapi:
+  gitHubRepository:
+    base-path: ""
+    title: GitHub Repository API
+    description: Servicio de dominio para repositorios (CRUD y forks).
+    version: 1.0.0
+  gitHubBranch:
+    base-path: ""
+    title: GitHub Branch API
+    description: Servicio de dominio para gestion de ramas.
+    version: 1.0.0
+  gitHubCollaborator:
+    base-path: ""
+    title: GitHub Collaborator API
+    description: Servicio de dominio para colaboradores y roles.
+    version: 1.0.0
+  gitHubContent:
+    base-path: ""
+    title: GitHub Content API
+    description: Servicio de dominio para contenidos y descarga de repositorio.
+    version: 1.0.0
+  gitHubSocial:
+    base-path: ""
+    title: GitHub Social API
+    description: Servicio de dominio para acciones sociales del repositorio (stars).
+    version: 1.0.0
+
+logging:
+  level:
+    com.githubx.githubrepositoryms: INFO
+    org.springframework.data.mongodb: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
