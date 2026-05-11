@@ -22,6 +22,23 @@ jobs:
           java-version: '25'
           cache: maven
 
+      - name: Set up Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('smithy/**/*.gradle', 'smithy/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Make gradlew executable
+        run: chmod +x smithy/gradlew
+
+      - name: Generate Smithy Java servers
+        run: ./gradlew generateAllJavaServers
+        working-directory: smithy
+
       - name: Make mvnw executable
         run: chmod +x mvnw
 
@@ -42,6 +59,23 @@ jobs:
           distribution: temurin
           java-version: '25'
           cache: maven
+
+      - name: Set up Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('smithy/**/*.gradle', 'smithy/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Make gradlew executable
+        run: chmod +x smithy/gradlew
+
+      - name: Generate Smithy Java servers
+        run: ./gradlew generateAllJavaServers
+        working-directory: smithy
 
       - name: Make mvnw executable
         run: chmod +x mvnw
