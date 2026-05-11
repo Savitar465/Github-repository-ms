@@ -14,6 +14,12 @@ spring:
     username: ${MONGO_USERNAME:}
     password: ${MONGO_PASSWORD:}
     authentication-database: ${MONGO_AUTH_DATABASE:admin}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/githubx}
+          jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8080/realms/githubx/protocol/openid-connect/certs}
 
 server:
   port: ${SERVER_PORT:8090}
@@ -63,15 +69,6 @@ openapi:
     title: GitHub Social API
     description: Servicio de dominio para acciones sociales del repositorio (stars).
     version: 1.0.0
-
-# ===== SEGURIDAD: OAuth2 Resource Server con JWT =====
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/githubx}
-          jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8080/realms/githubx/protocol/openid-connect/certs}
 
 # ===== gRPC =====
 grpc:
