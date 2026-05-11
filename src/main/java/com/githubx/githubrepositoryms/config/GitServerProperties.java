@@ -14,5 +14,6 @@ public class GitServerProperties {
         private String httpUrl = "http://192.168.100.150:9080";
         private String sshHost = "192.168.100.150";
         private int sshPort = 2222;
+        private String reposPath = "/git-server/repos";
     }
 }
