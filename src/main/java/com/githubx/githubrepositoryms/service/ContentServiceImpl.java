@@ -52,9 +52,10 @@ public class ContentServiceImpl implements ContentService {
         }
         RepositoryDocument repoDoc = repoOpt.get();
         String targetBranch = ref != null ? ref : repoDoc.getDefaultBranch();
+        String normalizedPath = path == null || path.isBlank() ? "" : path;
         List<FileEntryDTO> contents = fileEntryDao.findByRepositoryIdAndBranch(repoDoc.getId(), targetBranch)
                 .stream()
-                .filter(f -> f.getPath().startsWith(path))
+            .filter(f -> f.getPath().startsWith(normalizedPath))
                 .map(fileEntryMapper::toDto)
                 .toList();
         return ResponseEntity.ok(new GetRepoContentsBody(contents));

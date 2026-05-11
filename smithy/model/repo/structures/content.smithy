@@ -53,7 +53,6 @@ structure GetRepoContentsInput {
     @httpLabel
     repo: RepoName
 
-    @required
     @httpQuery("path")
     filePath: String
 
