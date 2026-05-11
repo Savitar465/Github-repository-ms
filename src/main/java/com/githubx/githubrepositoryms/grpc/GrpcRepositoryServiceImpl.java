@@ -7,8 +7,11 @@ import com.githubx.githubrepositoryms.service.RepositoryService;
 import com.githubx.githubrepositoryms.service.SocialService;
 import com.smithy.g.repo.server.branch.model.CreateBranchBody;
 import com.smithy.g.repo.server.collaborator.model.AddCollaboratorBody;
+import com.smithy.g.repo.server.repository.model.CreateRepositoryBody;
+import com.smithy.g.repo.server.repository.model.ForkRepositoryBody;
+import com.smithy.g.repo.server.repository.model.UpdateRepositoryBody;
+import com.smithy.g.repo.server.repository.model.RepositoryDTO;
 import com.smithy.g.repo.server.collaborator.model.UpdateCollaboratorRoleBody;
-import com.smithy.g.repo.server.repository.model.*;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +41,7 @@ public class GrpcRepositoryServiceImpl extends RepoServiceGrpc.RepoServiceImplBa
                     .name(req.getName())
                     .description(req.getDescription().isEmpty() ? null : req.getDescription())
                     .visibility(req.getVisibility() == RepoVisibility.REPO_VISIBILITY_UNSPECIFIED
-                            ? com.smithy.g.repo.server.repository.model.RepoVisibility.PUBLIC
+                        ? com.smithy.g.repo.server.repository.model.RepoVisibility.PUBLIC
                             : mapper.fromProtoVisibility(req.getVisibility()))
                     .language(req.getLanguage().isEmpty() ? null : req.getLanguage());
             var resp = repositoryService.createRepository(body);
@@ -100,7 +103,7 @@ public class GrpcRepositoryServiceImpl extends RepoServiceGrpc.RepoServiceImplBa
     public void listMyRepositories(ListMyRepositoriesRequest req,
                                    StreamObserver<ListMyRepositoriesResponse> obs) {
         try {
-            com.smithy.g.repo.server.repository.model.RepoVisibility visibility =
+                com.smithy.g.repo.server.repository.model.RepoVisibility visibility =
                     req.getVisibility() == RepoVisibility.REPO_VISIBILITY_UNSPECIFIED
                             ? null
                             : mapper.fromProtoVisibility(req.getVisibility());
@@ -203,7 +206,7 @@ public class GrpcRepositoryServiceImpl extends RepoServiceGrpc.RepoServiceImplBa
     public void addCollaborator(AddCollaboratorRequest req,
                                 StreamObserver<AddCollaboratorResponse> obs) {
         try {
-            com.smithy.g.repo.server.collaborator.model.CollaboratorRole role =
+                com.smithy.g.repo.server.collaborator.model.CollaboratorRole role =
                     req.getRole() == CollaboratorRole.COLLABORATOR_ROLE_UNSPECIFIED
                             ? com.smithy.g.repo.server.collaborator.model.CollaboratorRole.READ
                             : mapper.fromProtoCollaboratorRole(req.getRole());

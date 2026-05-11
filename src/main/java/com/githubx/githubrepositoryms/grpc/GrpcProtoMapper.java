@@ -38,7 +38,7 @@ public class GrpcProtoMapper {
             case READ -> com.githubx.grpc.proto.CollaboratorRole.COLLABORATOR_ROLE_READ;
             case WRITE -> com.githubx.grpc.proto.CollaboratorRole.COLLABORATOR_ROLE_WRITE;
             case ADMIN -> com.githubx.grpc.proto.CollaboratorRole.COLLABORATOR_ROLE_ADMIN;
-            case OWNER -> com.githubx.grpc.proto.CollaboratorRole.COLLABORATOR_ROLE_OWNER;
+            case MAINTAIN -> com.githubx.grpc.proto.CollaboratorRole.COLLABORATOR_ROLE_OWNER;
         };
     }
 
@@ -46,7 +46,7 @@ public class GrpcProtoMapper {
         return switch (r) {
             case COLLABORATOR_ROLE_WRITE -> CollaboratorRole.WRITE;
             case COLLABORATOR_ROLE_ADMIN -> CollaboratorRole.ADMIN;
-            case COLLABORATOR_ROLE_OWNER -> CollaboratorRole.OWNER;
+            case COLLABORATOR_ROLE_OWNER -> CollaboratorRole.MAINTAIN;
             default -> CollaboratorRole.READ;
         };
     }
@@ -67,7 +67,6 @@ public class GrpcProtoMapper {
                 .setDefaultBranch(safe(dto.getDefaultBranch()))
                 .setLanguage(safe(dto.getLanguage()))
                 .setHasIssues(dto.getHasIssues() != null && dto.getHasIssues())
-                .setForkedFromId(safe(dto.getForkedFromId()))
                 .setCreatedAt(safe(dto.getCreatedAt()))
                 .setUpdatedAt(safe(dto.getUpdatedAt()))
                 .build();
@@ -77,8 +76,6 @@ public class GrpcProtoMapper {
 
     public com.githubx.grpc.proto.BranchDTO toProtoBranch(BranchDTO dto) {
         return com.githubx.grpc.proto.BranchDTO.newBuilder()
-                .setId(safe(dto.getId()))
-                .setRepositoryId(safe(dto.getRepositoryId()))
                 .setName(safe(dto.getName()))
                 .setIsDefault(dto.getIsDefault() != null && dto.getIsDefault())
                 .setCommitSha(safe(dto.getCommitSha()))
@@ -89,8 +86,6 @@ public class GrpcProtoMapper {
 
     public com.githubx.grpc.proto.CollaboratorDTO toProtoCollaborator(CollaboratorDTO dto) {
         return com.githubx.grpc.proto.CollaboratorDTO.newBuilder()
-                .setId(safe(dto.getId()))
-                .setRepositoryId(safe(dto.getRepositoryId()))
                 .setUserId(safe(dto.getUserId()))
                 .setUsername(safe(dto.getUsername()))
                 .setRole(toProtoCollaboratorRole(dto.getRole()))
