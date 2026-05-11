@@ -79,7 +79,7 @@ public class GitServerAdminClient {
                 log.info("Git admin API [{}] → {}", operation, response.statusCode());
             }
         } catch (Exception e) {
-            log.error("Git admin API unreachable [{}]: {}", operation, e.getMessage());
+            log.error("Git admin API unreachable [{}]: {}", operation, e.toString(), e);
         }
     }
 }

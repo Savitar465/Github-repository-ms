@@ -1,0 +1,40 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${SERVER_PORT:-8090}:8090"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_AUTH_DATABASE=${MONGO_AUTH_DATABASE}
+      - MICROSERVICE_AUTH_TOKEN=${MICROSERVICE_AUTH_TOKEN}
+      - GIT_SERVER_HTTP_URL=http://host.docker.internal:9080
+      - GIT_SERVER_SSH_HOST=host.docker.internal
+      - GIT_SERVER_SSH_PORT=${GIT_SERVER_SSH_PORT}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:6.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    ports:
+      - "${MONGO_HOST_PORT:-27018}:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
