@@ -1,0 +1,313 @@
+syntax = "proto3";
+
+package com.githubx.grpc;
+
+option java_package = "com.githubx.grpc.proto";
+option java_outer_classname = "RepositoryServiceProto";
+option java_multiple_files = true;
+
+// ─────────────────────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────────────────────
+
+enum RepoVisibility {
+  REPO_VISIBILITY_UNSPECIFIED = 0;
+  REPO_VISIBILITY_PUBLIC = 1;
+  REPO_VISIBILITY_PRIVATE = 2;
+}
+
+enum CollaboratorRole {
+  COLLABORATOR_ROLE_UNSPECIFIED = 0;
+  COLLABORATOR_ROLE_READ = 1;
+  COLLABORATOR_ROLE_WRITE = 2;
+  COLLABORATOR_ROLE_ADMIN = 3;
+  COLLABORATOR_ROLE_OWNER = 4;
+}
+
+// ─────────────────────────────────────────────────────────────
+// COMMON MESSAGES
+// ─────────────────────────────────────────────────────────────
+
+message PaginationMeta {
+  int32 page = 1;
+  int32 per_page = 2;
+  int32 total = 3;
+}
+
+message PaginationRequest {
+  int32 page = 1;
+  int32 per_page = 2;
+}
+
+// ─────────────────────────────────────────────────────────────
+// REPOSITORY MESSAGES
+// ─────────────────────────────────────────────────────────────
+
+message RepositoryDTO {
+  string id = 1;
+  string name = 2;
+  string full_name = 3;
+  string description = 4;
+  RepoVisibility visibility = 5;
+  string owner_id = 6;
+  string owner_username = 7;
+  int32 stars_count = 8;
+  int32 forks_count = 9;
+  string default_branch = 10;
+  string language = 11;
+  bool has_issues = 12;
+  string forked_from_id = 13;
+  string created_at = 14;
+  string updated_at = 15;
+}
+
+// ─── Repository CRUD ──────────────────────────────────────────
+
+message GetRepositoryRequest {
+  string owner = 1;
+  string repo = 2;
+}
+
+message GetRepositoryResponse {
+  RepositoryDTO repository = 1;
+}
+
+message ListMyRepositoriesRequest {
+  RepoVisibility visibility = 1;
+  PaginationRequest pagination = 2;
+}
+
+message ListMyRepositoriesResponse {
+  repeated RepositoryDTO repositories = 1;
+  PaginationMeta pagination = 2;
+}
+
+message CreateRepositoryRequest {
+  string name = 1;
+  string description = 2;
+  RepoVisibility visibility = 3;
+  string language = 4;
+}
+
+message CreateRepositoryResponse {
+  RepositoryDTO repository = 1;
+}
+
+message UpdateRepositoryRequest {
+  string owner = 1;
+  string repo = 2;
+  string description = 3;
+  RepoVisibility visibility = 4;
+  bool has_issues = 5;
+  string language = 6;
+}
+
+message UpdateRepositoryResponse {
+  RepositoryDTO repository = 1;
+}
+
+message DeleteRepositoryRequest {
+  string owner = 1;
+  string repo = 2;
+}
+
+message DeleteRepositoryResponse {
+  bool success = 1;
+}
+
+// ─── Fork ─────────────────────────────────────────────────────
+
+message ForkRepositoryRequest {
+  string owner = 1;
+  string repo = 2;
+  string target_owner = 3;
+  string name = 4;
+}
+
+message ForkRepositoryResponse {
+  RepositoryDTO repository = 1;
+}
+
+message ListRepositoryForksRequest {
+  string owner = 1;
+  string repo = 2;
+}
+
+message ListRepositoryForksResponse {
+  repeated RepositoryDTO forks = 1;
+}
+
+// ─────────────────────────────────────────────────────────────
+// BRANCH MESSAGES
+// ─────────────────────────────────────────────────────────────
+
+message BranchDTO {
+  string id = 1;
+  string repository_id = 2;
+  string name = 3;
+  bool is_default = 4;
+  string commit_sha = 5;
+}
+
+message GetBranchRequest {
+  string owner = 1;
+  string repo = 2;
+  string branch = 3;
+}
+
+message GetBranchResponse {
+  BranchDTO branch = 1;
+}
+
+message ListBranchesRequest {
+  string owner = 1;
+  string repo = 2;
+}
+
+message ListBranchesResponse {
+  repeated BranchDTO branches = 1;
+}
+
+message CreateBranchRequest {
+  string owner = 1;
+  string repo = 2;
+  string name = 3;
+}
+
+message CreateBranchResponse {
+  BranchDTO branch = 1;
+}
+
+message DeleteBranchRequest {
+  string owner = 1;
+  string repo = 2;
+  string branch = 3;
+}
+
+message DeleteBranchResponse {
+  bool success = 1;
+}
+
+// ─────────────────────────────────────────────────────────────
+// COLLABORATOR MESSAGES
+// ─────────────────────────────────────────────────────────────
+
+message CollaboratorDTO {
+  string id = 1;
+  string repository_id = 2;
+  string user_id = 3;
+  string username = 4;
+  CollaboratorRole role = 5;
+  string avatar_url = 6;
+  string added_at = 7;
+}
+
+message AddCollaboratorRequest {
+  string owner = 1;
+  string repo = 2;
+  string username = 3;
+  CollaboratorRole role = 4;
+}
+
+message AddCollaboratorResponse {
+  CollaboratorDTO collaborator = 1;
+}
+
+message GetCollaboratorRequest {
+  string owner = 1;
+  string repo = 2;
+  string username = 3;
+}
+
+message GetCollaboratorResponse {
+  CollaboratorDTO collaborator = 1;
+}
+
+message ListCollaboratorsRequest {
+  string owner = 1;
+  string repo = 2;
+}
+
+message ListCollaboratorsResponse {
+  repeated CollaboratorDTO collaborators = 1;
+}
+
+message RemoveCollaboratorRequest {
+  string owner = 1;
+  string repo = 2;
+  string username = 3;
+}
+
+message RemoveCollaboratorResponse {
+  bool success = 1;
+}
+
+message UpdateCollaboratorRoleRequest {
+  string owner = 1;
+  string repo = 2;
+  string username = 3;
+  CollaboratorRole role = 4;
+}
+
+message UpdateCollaboratorRoleResponse {
+  CollaboratorDTO collaborator = 1;
+}
+
+// ─────────────────────────────────────────────────────────────
+// SOCIAL MESSAGES
+// ─────────────────────────────────────────────────────────────
+
+message StarRepositoryRequest {
+  string owner = 1;
+  string repo = 2;
+}
+
+message StarRepositoryResponse {
+  bool success = 1;
+}
+
+message UnstarRepositoryRequest {
+  string owner = 1;
+  string repo = 2;
+}
+
+message UnstarRepositoryResponse {
+  bool success = 1;
+}
+
+// ─────────────────────────────────────────────────────────────
+// SERVICES
+// ─────────────────────────────────────────────────────────────
+
+// Operaciones de lectura pública, sin autenticación
+service RepoPublicService {
+  rpc GetRepository(GetRepositoryRequest) returns (GetRepositoryResponse);
+  rpc ListRepositoryForks(ListRepositoryForksRequest) returns (ListRepositoryForksResponse);
+  rpc ListBranches(ListBranchesRequest) returns (ListBranchesResponse);
+  rpc GetBranch(GetBranchRequest) returns (GetBranchResponse);
+}
+
+// Operaciones protegidas, requieren JWT en metadata
+service RepoService {
+  // Repositorios
+  rpc CreateRepository(CreateRepositoryRequest) returns (CreateRepositoryResponse);
+  rpc UpdateRepository(UpdateRepositoryRequest) returns (UpdateRepositoryResponse);
+  rpc DeleteRepository(DeleteRepositoryRequest) returns (DeleteRepositoryResponse);
+  rpc ListMyRepositories(ListMyRepositoriesRequest) returns (ListMyRepositoriesResponse);
+  rpc ForkRepository(ForkRepositoryRequest) returns (ForkRepositoryResponse);
+
+  // Ramas
+  rpc CreateBranch(CreateBranchRequest) returns (CreateBranchResponse);
+  rpc DeleteBranch(DeleteBranchRequest) returns (DeleteBranchResponse);
+
+  // Colaboradores
+  rpc AddCollaborator(AddCollaboratorRequest) returns (AddCollaboratorResponse);
+  rpc GetCollaborator(GetCollaboratorRequest) returns (GetCollaboratorResponse);
+  rpc ListCollaborators(ListCollaboratorsRequest) returns (ListCollaboratorsResponse);
+  rpc RemoveCollaborator(RemoveCollaboratorRequest) returns (RemoveCollaboratorResponse);
+  rpc UpdateCollaboratorRole(UpdateCollaboratorRoleRequest) returns (UpdateCollaboratorRoleResponse);
+
+  // Social
+  rpc StarRepository(StarRepositoryRequest) returns (StarRepositoryResponse);
+  rpc UnstarRepository(UnstarRepositoryRequest) returns (UnstarRepositoryResponse);
+}

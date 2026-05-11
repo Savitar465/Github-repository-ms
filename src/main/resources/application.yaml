@@ -64,6 +64,20 @@ openapi:
     description: Servicio de dominio para acciones sociales del repositorio (stars).
     version: 1.0.0
 
+# ===== SEGURIDAD: OAuth2 Resource Server con JWT =====
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/githubx}
+          jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8080/realms/githubx/protocol/openid-connect/certs}
+
+# ===== gRPC =====
+grpc:
+  server:
+    port: ${GRPC_PORT:9092}
+
 git:
   server:
     http-url: ${GIT_SERVER_HTTP_URL:http://192.168.100.150:9080}
