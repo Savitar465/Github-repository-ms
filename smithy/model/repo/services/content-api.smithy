@@ -15,6 +15,7 @@ service ContentApi {
     version: "1.0.0"
     operations: [
         GetRepoContents
+        GetFileContent
         UploadFile
         DeleteFile
         DownloadArchive

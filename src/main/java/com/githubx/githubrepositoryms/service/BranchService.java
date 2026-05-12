@@ -14,4 +14,14 @@ public interface BranchService {
     ResponseEntity<BranchDTO> getBranch(String owner, String repo, String branch);
 
     ResponseEntity<ListBranchesBody> listBranches(String owner, String repo);
+
+    /**
+     * Synchronizes branches from the Git server to MongoDB.
+     * This method reads all branches from the Git repository and updates
+     * the MongoDB collection to match the actual state.
+     *
+     * @param owner Repository owner username
+     * @param repo  Repository name
+     */
+    void syncBranchesToMongo(String owner, String repo);
 }

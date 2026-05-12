@@ -7,7 +7,10 @@ import com.githubx.githubrepositoryms.dao.RepositoryDao;
 import com.githubx.githubrepositoryms.mapper.FileEntryMapper;
 import com.githubx.githubrepositoryms.model.FileEntryDocument;
 import com.githubx.githubrepositoryms.model.RepositoryDocument;
+import com.smithy.g.repo.server.content.model.FileContentDTO;
 import com.smithy.g.repo.server.content.model.FileEntryDTO;
+import com.smithy.g.repo.server.content.model.FileType;
+import com.smithy.g.repo.server.content.model.GetFileContentBody;
 import com.smithy.g.repo.server.content.model.GetRepoContentsBody;
 import com.smithy.g.repo.server.content.model.UploadFileBody;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -139,6 +143,74 @@ public class ContentServiceImpl implements ContentService {
                 .updatedAt(LocalDateTime.now())
                 .build();
         return fileEntryMapper.toDto(doc);
+    }
+
+    // ── getFileContent ───────────────────────────────────────────────────────
+
+    @Override
+    public ResponseEntity<GetFileContentBody> getFileContent(String owner, String repo,
+                                                              String filePath, String ref) {
+        Optional<RepositoryDocument> repoOpt = repositoryDao.findByOwnerUsernameAndName(owner, repo);
+        if (repoOpt.isEmpty()) return ResponseEntity.notFound().build();
+
+        RepositoryDocument repoDoc = repoOpt.get();
+        String targetRef = ref != null ? ref : repoDoc.getDefaultBranch();
+        String remoteUrl = remoteUrl(owner, repo);
+        Path tempDir = null;
+
+        try {
+            tempDir = Files.createTempDirectory("git-file-content-");
+
+            try (Git git = Git.cloneRepository()
+                    .setURI(remoteUrl)
+                    .setDirectory(tempDir.toFile())
+                    .setBare(true)
+                    .setCloneAllBranches(true)
+                    .call()) {
+
+                Repository repository = git.getRepository();
+                ObjectId commitId = resolveRef(repository, targetRef);
+                if (commitId == null) return ResponseEntity.notFound().build();
+
+                String normalizedPath = filePath.strip().replaceAll("^/+|/+$", "");
+
+                try (RevWalk revWalk = new RevWalk(repository)) {
+                    RevTree tree = revWalk.parseCommit(commitId).getTree();
+
+                    try (TreeWalk tw = TreeWalk.forPath(repository, normalizedPath, tree)) {
+                        if (tw == null) return ResponseEntity.notFound().build();
+
+                        // Check if it's a file (not a directory)
+                        if (tw.getFileMode(0).getObjectType() == Constants.OBJ_TREE) {
+                            return ResponseEntity.badRequest().build();
+                        }
+
+                        ObjectId objectId = tw.getObjectId(0);
+                        ObjectLoader loader = repository.open(objectId);
+                        byte[] bytes = loader.getBytes();
+                        String contentBase64 = Base64.getEncoder().encodeToString(bytes);
+                        String sha = objectId.getName();
+
+                        FileContentDTO fileContent = new FileContentDTO()
+                                .name(tw.getNameString())
+                                .path(normalizedPath)
+                                .sha(sha)
+                                .type(FileType.FILE)
+                                .size(BigDecimal.valueOf(bytes.length))
+                                .encoding("base64")
+                                .content(contentBase64);
+
+                        return ResponseEntity.ok(new GetFileContentBody().file(fileContent));
+                    }
+                }
+            }
+
+        } catch (GitAPIException | IOException e) {
+            log.error("Failed to read file content {}/{}/{}: {}", owner, repo, filePath, e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        } finally {
+            deleteTempDir(tempDir);
+        }
     }
 
     // ── uploadFile ────────────────────────────────────────────────────────────

@@ -71,6 +71,58 @@ structure GetRepoContentsBody {
     contents: FileEntryList
 }
 
+// ── GetFileContent structures ────────────────────────────────────────────────
+structure FileContentDTO {
+    @required
+    name: String
+
+    @required
+    path: String
+
+    @required
+    sha: String
+
+    @required
+    type: FileType
+
+    size: Long
+
+    /// "base64" para archivos con contenido
+    encoding: String
+
+    /// Contenido del archivo en base64
+    content: String
+
+    downloadUrl: Url
+}
+
+structure GetFileContentInput {
+    @required
+    @httpLabel
+    owner: Username
+
+    @required
+    @httpLabel
+    repo: RepoName
+
+    @required
+    @httpQuery("path")
+    filePath: String
+
+    @httpQuery("ref")
+    ref: String
+}
+
+structure GetFileContentOutput {
+    @required
+    @httpPayload
+    body: GetFileContentBody
+}
+
+structure GetFileContentBody {
+    file: FileContentDTO
+}
+
 structure UploadFileInput {
     @required
     @httpLabel

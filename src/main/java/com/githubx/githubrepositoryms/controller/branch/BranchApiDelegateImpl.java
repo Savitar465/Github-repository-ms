@@ -1,19 +1,17 @@
 package com.githubx.githubrepositoryms.controller.branch;
 
 import com.githubx.githubrepositoryms.service.BranchService;
-import com.smithy.g.repo.server.branch.api.V1Api;
+import com.smithy.g.repo.server.branch.api.V1ApiDelegate;
 import com.smithy.g.repo.server.branch.model.BranchDTO;
 import com.smithy.g.repo.server.branch.model.CreateBranchBody;
 import com.smithy.g.repo.server.branch.model.ListBranchesBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-@RestController
-@RequestMapping("${openapi.gitHubBranch.base-path:}")
+@Service
 @RequiredArgsConstructor
-public class BranchController implements V1Api {
+public class BranchApiDelegateImpl implements V1ApiDelegate {
 
     private final BranchService branchService;
 

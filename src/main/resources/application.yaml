@@ -1,19 +1,14 @@
 spring:
-  config:
-    import: optional:file:.env[.properties]
   application:
     name: Github-repository-ms
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
   data:
     mongodb:
       auto-index-creation: true
-  mongodb:
-    host: ${MONGO_HOST:192.168.100.150}
-    port: ${MONGO_PORT:27017}
-    database: ${MONGO_DATABASE:github_repository_ms}
-    username: ${MONGO_USERNAME:}
-    password: ${MONGO_PASSWORD:}
-    authentication-database: ${MONGO_AUTH_DATABASE:admin}
+      uri: mongodb://${MONGO_USERNAME:}:${MONGO_PASSWORD:}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DATABASE:github_repository_ms}?authSource=${MONGO_AUTH_DATABASE:admin}
   security:
     oauth2:
       resourceserver:
@@ -87,7 +82,10 @@ microservice:
 
 logging:
   level:
-    com.githubx.githubrepositoryms: INFO
+    com.githubx.githubrepositoryms: DEBUG
+    com.smithy.g.repo.server: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
     org.springframework.data.mongodb: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

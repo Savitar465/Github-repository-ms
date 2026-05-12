@@ -26,6 +26,20 @@ operation GetRepoContents {
     ]
 }
 
+@http(method: "GET", uri: "/v1/repos/{owner}/{repo}/file", code: 200)
+@readonly
+@documentation("Obtiene el contenido de un archivo específico del repositorio.")
+operation GetFileContent {
+    input: GetFileContentInput
+    output: GetFileContentOutput
+    errors: [
+        UnauthorizedError
+        ForbiddenError
+        NotFoundError
+        InternalServerError
+    ]
+}
+
 @http(method: "PUT", uri: "/v1/repos/{owner}/{repo}/contents", code: 201)
 @idempotent
 @documentation("Sube o actualiza un archivo en el repositorio.")
