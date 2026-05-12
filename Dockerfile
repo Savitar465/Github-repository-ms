@@ -13,7 +13,9 @@ COPY pom.xml mvnw .
 COPY .mvn .mvn
 COPY src src
 COPY smithy smithy
-RUN mvn -B -DskipTests package -DskipSmithy -Dmaven.repo.local=/root/.m2/repository || mvn -B -DskipTests package
+RUN chmod +x mvnw smithy/gradlew \
+	&& ./smithy/gradlew generateAllJavaServers --no-daemon -p smithy \
+	&& ./mvnw -B -DskipTests package
 
 FROM eclipse-temurin:25-jre
 WORKDIR /app
