@@ -1,5 +1,6 @@
 package com.githubx.githubrepositoryms.service;
 
+import com.githubx.githubrepositoryms.config.AuthContext;
 import com.githubx.githubrepositoryms.dao.RepositoryDao;
 import com.githubx.githubrepositoryms.mapper.RepositoryMapper;
 import com.githubx.githubrepositoryms.model.RepositoryDocument;
@@ -19,18 +20,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RepositoryServiceImpl implements RepositoryService {
 
-    private static final String DEFAULT_OWNER = "Anonymous";
-
+    private final AuthContext authContext;
     private final RepositoryDao repositoryDao;
     private final RepositoryMapper repositoryMapper;
     private final GitOpsService gitOpsService;
 
     @Override
     public ResponseEntity<RepositoryDTO> createRepository(CreateRepositoryBody body) {
+        String username = authContext.getUsername();
+        String userId = authContext.getUserId();
         RepositoryDocument doc = RepositoryDocument.builder()
                 .id(UUID.randomUUID().toString())
                 .name(body.getName())
-                .fullName(DEFAULT_OWNER + "/" + body.getName())
+                .fullName(username + "/" + body.getName())
                 .description(body.getDescription())
                 .visibility(body.getVisibility().name())
                 .language(body.getLanguage())
@@ -38,8 +40,8 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .starsCount(0)
                 .forksCount(0)
                 .defaultBranch("main")
-                .ownerUsername(DEFAULT_OWNER)
-                .ownerId(UUID.randomUUID().toString())
+                .ownerUsername(username)
+                .ownerId(userId)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -69,9 +71,10 @@ public class RepositoryServiceImpl implements RepositoryService {
     public ResponseEntity<ListRepositoriesBody> listMyRepositories(RepoVisibility visibility,
                                                                     BigDecimal page,
                                                                     BigDecimal perPage) {
+        String username = authContext.getUsername();
         List<RepositoryDocument> docs = visibility != null
-                ? repositoryDao.findByOwnerUsernameAndVisibility(DEFAULT_OWNER, visibility.name())
-                : repositoryDao.findByOwnerUsername(DEFAULT_OWNER);
+                ? repositoryDao.findByOwnerUsernameAndVisibility(username, visibility.name())
+                : repositoryDao.findByOwnerUsername(username);
 
         int pageNum = page != null ? page.intValue() : 1;
         int size = perPage != null ? perPage.intValue() : 30;
@@ -114,7 +117,7 @@ public class RepositoryServiceImpl implements RepositoryService {
             return ResponseEntity.notFound().build();
         }
         RepositoryDocument original = source.get();
-        String forkOwner = body.getTargetOwner() != null ? body.getTargetOwner() : DEFAULT_OWNER;
+        String forkOwner = body.getTargetOwner() != null ? body.getTargetOwner() : authContext.getUsername();
         String forkName = body.getName() != null ? body.getName() : original.getName();
 
         RepositoryDocument fork = RepositoryDocument.builder()

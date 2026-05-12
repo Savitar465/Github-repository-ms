@@ -1,5 +1,6 @@
 package com.githubx.githubrepositoryms.service;
 
+import com.githubx.githubrepositoryms.config.AuthContext;
 import com.githubx.githubrepositoryms.dao.RepositoryDao;
 import com.githubx.githubrepositoryms.dao.StarDao;
 import com.githubx.githubrepositoryms.model.RepositoryDocument;
@@ -16,29 +17,28 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SocialServiceImpl implements SocialService {
 
-    private static final String ANONYMOUS_USER_ID = "anonymous-user-id";
-
+    private final AuthContext authContext;
     private final StarDao starDao;
     private final RepositoryDao repositoryDao;
 
     @Override
     public ResponseEntity<Void> starRepository(String owner, String repo) {
-        return star(owner, repo, ANONYMOUS_USER_ID);
+        return star(owner, repo, authContext.getUserId());
     }
 
     @Override
     public ResponseEntity<Void> starRepositoryForAuthenticatedUser(String owner, String repo) {
-        return star(owner, repo, ANONYMOUS_USER_ID);
+        return star(owner, repo, authContext.getUserId());
     }
 
     @Override
     public ResponseEntity<Void> unstarRepository(String owner, String repo) {
-        return unstar(owner, repo, ANONYMOUS_USER_ID);
+        return unstar(owner, repo, authContext.getUserId());
     }
 
     @Override
     public ResponseEntity<Void> unstarRepositoryForAuthenticatedUser(String owner, String repo) {
-        return unstar(owner, repo, ANONYMOUS_USER_ID);
+        return unstar(owner, repo, authContext.getUserId());
     }
 
     private ResponseEntity<Void> star(String owner, String repo, String userId) {
