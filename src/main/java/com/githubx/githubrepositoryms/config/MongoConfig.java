@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Configuration
 public class MongoConfig extends AbstractMongoClientConfiguration {
 
@@ -40,8 +43,10 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     public MongoClient mongoClient() {
         String uri;
         if (username != null && !username.isEmpty()) {
+            String encodedUser = URLEncoder.encode(username, StandardCharsets.UTF_8);
+            String encodedPass = URLEncoder.encode(password, StandardCharsets.UTF_8);
             uri = String.format("mongodb://%s:%s@%s:%d/%s?authSource=%s",
-                    username, password, host, port, database, authDatabase);
+                    encodedUser, encodedPass, host, port, database, authDatabase);
         } else {
             uri = String.format("mongodb://%s:%d/%s", host, port, database);
         }
