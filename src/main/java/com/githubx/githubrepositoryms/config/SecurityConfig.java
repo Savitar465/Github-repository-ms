@@ -41,6 +41,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(PUBLIC_MATCHERS).permitAll()
+                .requestMatchers(HttpMethod.GET, "/v1/repos/public").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v1/repos/{owner}/{repo}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v1/repos/{owner}/{repo}/branches").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v1/repos/{owner}/{repo}/branches/{branch}").permitAll()
@@ -50,6 +51,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/v1/repos/{owner}/{repo}/forks").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v1/repos/{owner}/{repo}/commits").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v1/repos/{owner}/{repo}/commits/{sha}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/v1/repos/{owner}/{repo}/collaborators").permitAll()
                 .requestMatchers(HttpMethod.GET, "/repos/{owner}/{repo}/compare").permitAll()
                 .anyRequest().authenticated()
             )
