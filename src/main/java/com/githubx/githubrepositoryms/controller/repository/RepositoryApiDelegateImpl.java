@@ -60,4 +60,20 @@ public class RepositoryApiDelegateImpl implements V1ApiDelegate {
             String repo) {
         return repositoryService.listRepositoryForks(owner, repo);
     }
+
+    @Override
+    public ResponseEntity<SearchRepositoriesBody> searchRepositories(
+            String q,
+            BigDecimal page,
+            BigDecimal perPage) {
+        return repositoryService.searchRepositories(q, page, perPage);
+    }
+
+    @Override
+    public ResponseEntity<ListPublicRepositoriesBody> listPublicRepositories(
+            BigDecimal page,
+            BigDecimal perPage,
+            String sort) {
+        return repositoryService.listPublicRepositories(page, perPage, sort);
+    }
 }

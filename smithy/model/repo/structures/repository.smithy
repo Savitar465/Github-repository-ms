@@ -2,6 +2,7 @@ $version: "2"
 
 namespace com.github.repo
 
+use com.github.common#PaginationMeta
 use com.github.common#RepoName
 use com.github.common#RepoVisibility
 use com.github.common#Username
@@ -182,4 +183,59 @@ structure ListRepositoryForksOutput {
     @required
     @httpPayload
     body: ListRepositoryForksBody
+}
+
+structure SearchRepositoriesInput {
+    @required
+    @httpQuery("q")
+    query: String
+
+    @httpQuery("page")
+    @range(min: 1)
+    page: Integer
+
+    @httpQuery("perPage")
+    @range(min: 1, max: 100)
+    perPage: Integer
+}
+
+structure SearchRepositoriesOutput {
+    @required
+    @httpPayload
+    body: SearchRepositoriesBody
+}
+
+structure SearchRepositoriesBody {
+    @required
+    repositories: RepositoryList
+
+    @required
+    pagination: PaginationMeta
+}
+
+structure ListPublicRepositoriesInput {
+    @httpQuery("page")
+    @range(min: 1)
+    page: Integer
+
+    @httpQuery("perPage")
+    @range(min: 1, max: 100)
+    perPage: Integer
+
+    @httpQuery("sort")
+    sort: String
+}
+
+structure ListPublicRepositoriesOutput {
+    @required
+    @httpPayload
+    body: ListPublicRepositoriesBody
+}
+
+structure ListPublicRepositoriesBody {
+    @required
+    repositories: RepositoryList
+
+    @required
+    pagination: PaginationMeta
 }
