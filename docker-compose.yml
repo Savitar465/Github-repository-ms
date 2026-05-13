@@ -16,10 +16,13 @@ services:
       - MONGO_USERNAME=${MONGO_USERNAME}
       - MONGO_PASSWORD=${MONGO_PASSWORD}
       - MONGO_AUTH_DATABASE=${MONGO_AUTH_DATABASE}
+      - SPRING_DATA_MONGODB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}?authSource=${MONGO_AUTH_DATABASE}
       - MICROSERVICE_AUTH_TOKEN=${MICROSERVICE_AUTH_TOKEN}
       - GIT_SERVER_HTTP_URL=http://host.docker.internal:9080
       - GIT_SERVER_SSH_HOST=host.docker.internal
       - GIT_SERVER_SSH_PORT=${GIT_SERVER_SSH_PORT}
+      - JWT_ISSUER_URI=${JWT_ISSUER_URI}
+      - JWT_JWK_SET_URI=${JWT_JWK_SET_URI}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped

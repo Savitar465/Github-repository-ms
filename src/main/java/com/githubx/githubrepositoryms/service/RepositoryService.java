@@ -24,4 +24,8 @@ public interface RepositoryService {
                                                   ForkRepositoryBody body);
 
     ResponseEntity<ListRepositoryForksBody> listRepositoryForks(String owner, String repo);
+
+    ResponseEntity<SearchRepositoriesBody> searchRepositories(String query, BigDecimal page, BigDecimal perPage);
+
+    ResponseEntity<ListPublicRepositoriesBody> listPublicRepositories(BigDecimal page, BigDecimal perPage, String sort);
 }

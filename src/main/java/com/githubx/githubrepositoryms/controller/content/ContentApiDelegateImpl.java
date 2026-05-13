@@ -1,19 +1,18 @@
 package com.githubx.githubrepositoryms.controller.content;
 
 import com.githubx.githubrepositoryms.service.ContentService;
-import com.smithy.g.repo.server.content.api.V1Api;
+import com.smithy.g.repo.server.content.api.V1ApiDelegate;
 import com.smithy.g.repo.server.content.model.FileEntryDTO;
+import com.smithy.g.repo.server.content.model.GetFileContentBody;
 import com.smithy.g.repo.server.content.model.GetRepoContentsBody;
 import com.smithy.g.repo.server.content.model.UploadFileBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-@RestController
-@RequestMapping("${openapi.gitHubContent.base-path:}")
+@Service
 @RequiredArgsConstructor
-public class ContentController implements V1Api {
+public class ContentApiDelegateImpl implements V1ApiDelegate {
 
     private final ContentService contentService;
 
@@ -27,6 +26,12 @@ public class ContentController implements V1Api {
     public ResponseEntity<GetRepoContentsBody> getRepoContents(String owner, String repo,
                                                                 String path, String ref) {
         return contentService.getRepoContents(owner, repo, path, ref);
+    }
+
+    @Override
+    public ResponseEntity<GetFileContentBody> getFileContent(String owner, String repo,
+                                                              String filePath, String ref) {
+        return contentService.getFileContent(owner, repo, filePath, ref);
     }
 
     @Override

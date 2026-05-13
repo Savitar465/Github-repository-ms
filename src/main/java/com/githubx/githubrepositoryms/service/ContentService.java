@@ -1,6 +1,7 @@
 package com.githubx.githubrepositoryms.service;
 
 import com.smithy.g.repo.server.content.model.FileEntryDTO;
+import com.smithy.g.repo.server.content.model.GetFileContentBody;
 import com.smithy.g.repo.server.content.model.GetRepoContentsBody;
 import com.smithy.g.repo.server.content.model.UploadFileBody;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,9 @@ public interface ContentService {
 
     ResponseEntity<GetRepoContentsBody> getRepoContents(String owner, String repo,
                                                          String path, String ref);
+
+    ResponseEntity<GetFileContentBody> getFileContent(String owner, String repo,
+                                                       String filePath, String ref);
 
     ResponseEntity<FileEntryDTO> uploadFile(String owner, String repo, String path,
                                              UploadFileBody body);

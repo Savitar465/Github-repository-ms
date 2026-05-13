@@ -1,16 +1,14 @@
 package com.githubx.githubrepositoryms.controller.social;
 
 import com.githubx.githubrepositoryms.service.SocialService;
-import com.smithy.g.repo.server.social.api.V1Api;
+import com.smithy.g.repo.server.social.api.V1ApiDelegate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-@RestController
-@RequestMapping("${openapi.gitHubSocial.base-path:}")
+@Service
 @RequiredArgsConstructor
-public class SocialController implements V1Api {
+public class SocialApiDelegateImpl implements V1ApiDelegate {
 
     private final SocialService socialService;
 

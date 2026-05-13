@@ -1,12 +1,17 @@
 package com.githubx.githubrepositoryms.service;
 
 import com.githubx.githubrepositoryms.config.AuthContext;
+import com.githubx.githubrepositoryms.dao.CollaboratorDao;
 import com.githubx.githubrepositoryms.dao.RepositoryDao;
 import com.githubx.githubrepositoryms.mapper.RepositoryMapper;
+import com.githubx.githubrepositoryms.model.CollaboratorDocument;
 import com.githubx.githubrepositoryms.model.RepositoryDocument;
 import com.githubx.githubrepositoryms.service.git.GitOpsService;
 import com.smithy.g.repo.server.repository.model.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,6 +27,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     private final AuthContext authContext;
     private final RepositoryDao repositoryDao;
+    private final CollaboratorDao collaboratorDao;
     private final RepositoryMapper repositoryMapper;
     private final GitOpsService gitOpsService;
 
@@ -47,6 +53,18 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .build();
         RepositoryDocument saved = repositoryDao.save(doc);
         gitOpsService.createBareRepo(saved.getOwnerUsername(), saved.getName());
+
+        // Add owner as collaborator with ADMIN role
+        CollaboratorDocument ownerCollaborator = CollaboratorDocument.builder()
+                .id(UUID.randomUUID().toString())
+                .repositoryId(saved.getId())
+                .userId(userId)
+                .username(username)
+                .role("ADMIN")
+                .addedAt(LocalDateTime.now())
+                .build();
+        collaboratorDao.save(ownerCollaborator);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(repositoryMapper.toDto(saved));
     }
 
@@ -73,7 +91,7 @@ public class RepositoryServiceImpl implements RepositoryService {
                                                                     BigDecimal perPage) {
         String username = authContext.getUsername();
         List<RepositoryDocument> docs = visibility != null
-                ? repositoryDao.findByOwnerUsernameAndVisibility(username, visibility.name())
+                ? repositoryDao.findByOwnerUsernameAndVisibility(username, visibility.getValue())
                 : repositoryDao.findByOwnerUsername(username);
 
         int pageNum = page != null ? page.intValue() : 1;
@@ -156,5 +174,57 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .map(repositoryMapper::toDto)
                 .toList();
         return ResponseEntity.ok(new ListRepositoryForksBody(forks));
+    }
+
+    @Override
+    public ResponseEntity<SearchRepositoriesBody> searchRepositories(String query, BigDecimal page, BigDecimal perPage) {
+        int pageNum = page != null ? page.intValue() : 1;
+        int size = perPage != null ? perPage.intValue() : 20;
+
+        Page<RepositoryDocument> resultPage = repositoryDao.searchPublicRepositories(
+                query,
+                PageRequest.of(pageNum - 1, size)
+        );
+
+        List<RepositoryDTO> dtos = resultPage.getContent().stream()
+                .map(repositoryMapper::toDto)
+                .toList();
+
+        PaginationMeta meta = new PaginationMeta()
+                .page(BigDecimal.valueOf(pageNum))
+                .perPage(BigDecimal.valueOf(size))
+                .total(BigDecimal.valueOf(resultPage.getTotalElements()))
+                .totalPages(BigDecimal.valueOf(resultPage.getTotalPages()));
+
+        return ResponseEntity.ok(new SearchRepositoriesBody(dtos, meta));
+    }
+
+    @Override
+    public ResponseEntity<ListPublicRepositoriesBody> listPublicRepositories(BigDecimal page, BigDecimal perPage, String sort) {
+        int pageNum = page != null ? page.intValue() : 1;
+        int size = perPage != null ? perPage.intValue() : 20;
+
+        Sort sorting = Sort.by(Sort.Direction.DESC, "createdAt");
+        if ("stars".equalsIgnoreCase(sort)) {
+            sorting = Sort.by(Sort.Direction.DESC, "starsCount");
+        } else if ("updated".equalsIgnoreCase(sort)) {
+            sorting = Sort.by(Sort.Direction.DESC, "updatedAt");
+        }
+
+        Page<RepositoryDocument> resultPage = repositoryDao.findAllPublicRepositories(
+                PageRequest.of(pageNum - 1, size, sorting)
+        );
+
+        List<RepositoryDTO> dtos = resultPage.getContent().stream()
+                .map(repositoryMapper::toDto)
+                .toList();
+
+        PaginationMeta meta = new PaginationMeta()
+                .page(BigDecimal.valueOf(pageNum))
+                .perPage(BigDecimal.valueOf(size))
+                .total(BigDecimal.valueOf(resultPage.getTotalElements()))
+                .totalPages(BigDecimal.valueOf(resultPage.getTotalPages()));
+
+        return ResponseEntity.ok(new ListPublicRepositoriesBody(dtos, meta));
     }
 }

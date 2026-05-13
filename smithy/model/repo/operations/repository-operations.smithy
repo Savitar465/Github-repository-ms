@@ -107,3 +107,26 @@ operation ListRepositoryForks {
         InternalServerError
     ]
 }
+
+@http(method: "GET", uri: "/v1/repos/search", code: 200)
+@readonly
+@documentation("Busca repositorios publicos por nombre o descripcion.")
+operation SearchRepositories {
+    input: SearchRepositoriesInput
+    output: SearchRepositoriesOutput
+    errors: [
+        UnauthorizedError
+        InternalServerError
+    ]
+}
+
+@http(method: "GET", uri: "/v1/repos/public", code: 200)
+@readonly
+@documentation("Lista todos los repositorios publicos (feed de exploracion).")
+operation ListPublicRepositories {
+    input: ListPublicRepositoriesInput
+    output: ListPublicRepositoriesOutput
+    errors: [
+        InternalServerError
+    ]
+}

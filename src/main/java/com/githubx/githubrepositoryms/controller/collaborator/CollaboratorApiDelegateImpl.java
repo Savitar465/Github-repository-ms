@@ -1,17 +1,15 @@
 package com.githubx.githubrepositoryms.controller.collaborator;
 
 import com.githubx.githubrepositoryms.service.CollaboratorService;
-import com.smithy.g.repo.server.collaborator.api.V1Api;
+import com.smithy.g.repo.server.collaborator.api.V1ApiDelegate;
 import com.smithy.g.repo.server.collaborator.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-@RestController
-@RequestMapping("${openapi.gitHubCollaborator.base-path:}")
+@Service
 @RequiredArgsConstructor
-public class CollaboratorController implements V1Api {
+public class CollaboratorApiDelegateImpl implements V1ApiDelegate {
 
     private final CollaboratorService collaboratorService;
 

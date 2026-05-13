@@ -21,5 +21,7 @@ service RepositoryApi {
         DeleteRepository
         ForkRepository
         ListRepositoryForks
+        SearchRepositories
+        ListPublicRepositories
     ]
 }
