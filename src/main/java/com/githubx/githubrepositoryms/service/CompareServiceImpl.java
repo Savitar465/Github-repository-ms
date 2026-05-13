@@ -137,11 +137,27 @@ public class CompareServiceImpl implements CompareService {
                     .setCloneAllBranches(true)
                     .call()) {
 
-                // Checkout target branch
-                git.checkout()
-                        .setName(targetBranch)
-                        .setCreateBranch(false)
-                        .call();
+                // Checkout target branch (handle remote branches)
+                ObjectId targetId = git.getRepository().resolve(targetBranch);
+                if (targetId == null) {
+                    // Branch doesn't exist locally, try to checkout from remote
+                    targetId = git.getRepository().resolve("origin/" + targetBranch);
+                    if (targetId == null) {
+                        return ResponseEntity.badRequest()
+                                .body(MergeResult.failure("Target branch not found: " + targetBranch));
+                    }
+                    // Create local branch tracking remote
+                    git.checkout()
+                            .setName(targetBranch)
+                            .setCreateBranch(true)
+                            .setStartPoint("origin/" + targetBranch)
+                            .call();
+                } else {
+                    git.checkout()
+                            .setName(targetBranch)
+                            .setCreateBranch(false)
+                            .call();
+                }
 
                 log.info("Checked out target branch: {}", targetBranch);
 

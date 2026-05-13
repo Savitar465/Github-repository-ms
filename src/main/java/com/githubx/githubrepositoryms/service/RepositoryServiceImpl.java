@@ -1,8 +1,10 @@
 package com.githubx.githubrepositoryms.service;
 
 import com.githubx.githubrepositoryms.config.AuthContext;
+import com.githubx.githubrepositoryms.dao.CollaboratorDao;
 import com.githubx.githubrepositoryms.dao.RepositoryDao;
 import com.githubx.githubrepositoryms.mapper.RepositoryMapper;
+import com.githubx.githubrepositoryms.model.CollaboratorDocument;
 import com.githubx.githubrepositoryms.model.RepositoryDocument;
 import com.githubx.githubrepositoryms.service.git.GitOpsService;
 import com.smithy.g.repo.server.repository.model.*;
@@ -25,6 +27,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     private final AuthContext authContext;
     private final RepositoryDao repositoryDao;
+    private final CollaboratorDao collaboratorDao;
     private final RepositoryMapper repositoryMapper;
     private final GitOpsService gitOpsService;
 
@@ -50,6 +53,18 @@ public class RepositoryServiceImpl implements RepositoryService {
                 .build();
         RepositoryDocument saved = repositoryDao.save(doc);
         gitOpsService.createBareRepo(saved.getOwnerUsername(), saved.getName());
+
+        // Add owner as collaborator with ADMIN role
+        CollaboratorDocument ownerCollaborator = CollaboratorDocument.builder()
+                .id(UUID.randomUUID().toString())
+                .repositoryId(saved.getId())
+                .userId(userId)
+                .username(username)
+                .role("ADMIN")
+                .addedAt(LocalDateTime.now())
+                .build();
+        collaboratorDao.save(ownerCollaborator);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(repositoryMapper.toDto(saved));
     }
 
