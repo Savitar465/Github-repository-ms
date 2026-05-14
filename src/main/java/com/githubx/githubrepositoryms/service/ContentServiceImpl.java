@@ -19,7 +19,10 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.*;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
+
+import java.util.Collection;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.RefSpec;
@@ -63,6 +66,13 @@ public class ContentServiceImpl implements ContentService {
         Path tempDir = null;
 
         try {
+            // Check if repo is empty (no commits)
+            Collection<Ref> remoteRefs = Git.lsRemoteRepository().setRemote(remoteUrl).call();
+            if (remoteRefs.isEmpty()) {
+                // Return empty list for empty repos
+                return ResponseEntity.ok(new GetRepoContentsBody(new ArrayList<>()));
+            }
+
             tempDir = Files.createTempDirectory("git-contents-");
 
             try (Git git = Git.cloneRepository()
@@ -159,6 +169,12 @@ public class ContentServiceImpl implements ContentService {
         Path tempDir = null;
 
         try {
+            // Check if repo is empty (no commits)
+            Collection<Ref> remoteRefs = Git.lsRemoteRepository().setRemote(remoteUrl).call();
+            if (remoteRefs.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
             tempDir = Files.createTempDirectory("git-file-content-");
 
             try (Git git = Git.cloneRepository()

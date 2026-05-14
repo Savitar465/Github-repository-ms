@@ -54,6 +54,10 @@ public class RepositoryServiceImpl implements RepositoryService {
         RepositoryDocument saved = repositoryDao.save(doc);
         gitOpsService.createBareRepo(saved.getOwnerUsername(), saved.getName());
 
+        // Initialize with README.md so main branch exists from the start
+        String email = authContext.getEmail() != null ? authContext.getEmail() : username + "@local";
+        gitOpsService.initializeRepoWithReadme(saved.getOwnerUsername(), saved.getName(), username, email);
+
         // Add owner as collaborator with ADMIN role
         CollaboratorDocument ownerCollaborator = CollaboratorDocument.builder()
                 .id(UUID.randomUUID().toString())
